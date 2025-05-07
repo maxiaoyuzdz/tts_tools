@@ -1,0 +1,34 @@
+change name
+$index = 9; Get-ChildItem *.wav | Sort-Object Name | ForEach-Object { Rename-Item $_ "zm_man_$($index).wav"; $index++ }
+
+
+Get-ChildItem -File | Select-Object Name | Out-File 文件列表.txt
+
+file list without suffix
+Get-ChildItem -File | ForEach-Object { $_.BaseName } | Out-File 文件列表2.txt
+
+
+抽离音频
+ffmpeg -i input.mp4 -q:a 2 -map a output.mp3
+
+计算音频长度
+ffprobe -v error -show_entries format=duration -of default=nw=1 "input.wav"
+ffprobe -v error -show_entries format=duration -of default=nw=1 "input.mp3"
+
+
+基本ok
+ffmpeg -i output_audio.wav -i 2.wav -filter_complex "[0:a]atrim=0:6.06,asetpts=PTS-STARTPTS[a1]; [0:a]atrim=10.753658,asetpts=PTS-STARTPTS[a2]; [a1][1:a][a2]concat=n=3:v=0:a=1" output_final.wav
+
+ffmpeg -i output_audio.wav -i 2.wav -filter_complex "[0:a]atrim=0:6.06,asetpts=PTS-STARTPTS[a1]; [0:a]atrim=10.753658,asetpts=PTS-STARTPTS[a2]; [a1][1:a][a2]concat=n=3:v=0:a=1" -b:a 192k output_final.mp3
+
+ffmpeg -i output_audio.mp3 -i 2.mp3 -filter_complex "[0:a]atrim=0:6.06,asetpts=PTS-STARTPTS[a1];[0:a]atrim=10.753658,asetpts=PTS-STARTPTS[a2];[a1][1:a][a2]concat=n=3:v=0:a=1" -b:a 192k -y -ar 44100 -ac 2 output_final.mp3
+
+
+合并
+
+ffmpeg -i original.mp4 -i audio.mp3 -c:v copy -c:a aac -map 0:v:0 -map 1:a:0 -shortest output.mp4
+
+
+
+
+将以下被格式化的数据文本中的每行最后一项，被[]包围的英文内容翻译成中文，要尽量保持上下文连贯,然后按照原格式和其他内容不变的方式输出
